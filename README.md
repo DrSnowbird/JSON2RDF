@@ -9,28 +9,40 @@ The lost ordering should not be a problem in the majority of cases, as RDF appli
 A common use case is feeding the JSON2RDF output into a triplestore or SPARQL processor and using a SPARQL `CONSTRUCT` query to map the generic RDF to more specific RDF that uses terms from some vocabulary.
 SPARQL is an inherently more flexible RDF mapping mechanism than JSON-LD `@context`.
 
-## Build
+## Build (Docker)
 
-    mvn clean install
-
-That should produce an executable JAR file `target/json2rdf-1.0.1-jar-with-dependencies.jar` in which dependency libraries will be included.
+    make build
 
 ## Usage
+```
+json2rdf.sh -i <JSON_INPUT> [-o <TTL_OUTPUT>] [-b <BASE_URL>] [--input-charset <INPUT_CHARSET>] [--output-charset <OUTPUT_CHARSET>]
 
-The JSON data is read from `stdin`, the resulting RDF data is written to `stdout`.
-
-JSON2RDF is available as a `.jar` as well as a Docker image [atomgraph/json2rdf](https://hub.docker.com/r/atomgraph/json2rdf) (recommended).
-
-Parameters:
-* `base` - the base URI for the data. Property namespace is constructed by adding `#` to the base URI.
-
-Options:
+```
+* `JSON_INPUT`: The JSON data 
+* `TTL_OUTPUT`: The resulting RDF data is written in TTL.
+* `BASE_URL`  : The base URI for the data. Property namespace is constructed by adding `#` to the base URI. Default is "https://localhost/"
+Optional args:
 * `--input-charset` - JSON input encoding, by default UTF-8
 * `--output-charset` - RDF output encoding, by default UTF-8
 
 ## Examples
+```
+./json2rdf.sh -i json/city-distances.json 
 
-JSON2RDF output is streaming and produces N-Triples, therefore we pipe it through [`riot`](https://jena.apache.org/documentation/io/) to get a more readable Turtle output.
+./json2rdf.sh -i json/city-distances.json -b https://127.0.0.1/test
+
+./json2rdf.sh -i json/city-distances.json -b https://127.0.0.1/test --input-charset utf-8
+./json2rdf.sh -i json/city-distances.json -b https://127.0.0.1/test --input-charset=utf-8
+./json2rdf.sh -i json/city-distances.json -b https://127.0.0.1/test --input-charset=utf-8 --output-charset=utf-8
+./json2rdf.sh -i json/city-distances.json -b https://127.0.0.1/test --output-charset=utf-8
+./json2rdf.sh -i json/city-distances.json -b https://127.0.0.1/test --output-charset utf-8
+./json2rdf.sh -i json/city-distances.json -b https://127.0.0.1/test --output-charset=utf-8
+./json2rdf.sh -i json/city-distances.json -b https://127.0.0.1/test --input-charset=utf-8
+./json2rdf.sh -i json/city-distances.json -b https://127.0.0.1/test --input-charsetutf-8
+./json2rdf.sh -i json/city-distances.json -b https://127.0.0.1/test --input-charset utf-8
+./json2rdf.sh -i json/city-distances.json -b https://127.0.0.1/test --input-charset=utf-8 --output-charset=utf-16
+./json2rdf.sh -i json/city-distances.json -b https://127.0.0.1/test --input-charset=utf-8 --output-charset=utf-8
+```
 
 ***
 
@@ -38,7 +50,7 @@ Bob DuCharme's blog post on using JSON2RDF: [Converting JSON to RDF](http://www.
 
 ***
 
-JSON data in [`ordinary-json-document.json`](https://www.w3.org/TR/json-ld11/#interpreting-json-as-json-ld)
+JSON data in [`example.json`](https://www.w3.org/TR/json-ld11/#interpreting-json-as-json-ld)
 ```json
 {
   "name": "Markus Lanthaler",
@@ -47,15 +59,9 @@ JSON data in [`ordinary-json-document.json`](https://www.w3.org/TR/json-ld11/#in
 }
 ```
 
-Java execution from shell:
+Docker execution from shell:
 
-    cat ordinary-json-document.json | java -jar json2rdf-1.0.1-jar-with-dependencies.jar https://localhost/ | riot --formatted=TURTLE
-
-Alternatively, Docker execution from shell:
-
-    cat ordinary-json-document.json | docker run -i -a stdin -a stdout -a stderr atomgraph/json2rdf https://localhost/ | riot --formatted=TURTLE
-
-Note that using Docker you need to [bind](https://docs.docker.com/engine/reference/commandline/run/#attach-to-stdinstdoutstderr--a) `stdin`/`stdout`/`stderr` streams.
+    ./json2rdf.sh -i example.json
 
 Turtle output
 
@@ -132,13 +138,9 @@ JSON data in [`city-distances.json`](https://www.w3.org/TR/xslt-30/#json-to-xml-
 }
 ```
 
-Java execution from shell:
+Docker execution from shell:
 
-    cat city-distances.json | java -jar json2rdf-1.0.1-jar-with-dependencies.jar https://localhost/ | riot --formatted=TURTLE
-
-Alternatively, Docker execution from shell:
-
-    cat city-distances.json | docker run -i -a stdin -a stdout -a stderr atomgraph/json2rdf https://localhost/ | riot --formatted=TURTLE
+    ./json2rdf.sh -i json/city-distances.json
 
 Turtle output
 
@@ -187,7 +189,7 @@ Turtle output
 ```
 
 ## Performance
-
+(from upstream's Performance text - not by me)
 Largest dataset tested so far: 2.95 GB / 30459482 lines of JSON to 4.5 GB / 21964039 triples in 2m10s.
 Hardware: x64 Windows 10 PC with Intel Core i5-7200U 2.5 GHz CPU and 16 GB RAM.
 

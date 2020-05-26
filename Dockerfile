@@ -1,13 +1,20 @@
-FROM maven:3.6.0-jdk-8
+#FROM maven:3.6.0-jdk-8
+FROM openkbs/jdk-mvn-py3
 
-LABEL maintainer="martynas@atomgraph.com"
+ENV APP_HOME=${HOME}/app
+RUN mkdir -p ${APP_HOME}
 
-COPY . /usr/src/JSON2RDF
+LABEL maintainer="DrSnowbird@openkbs.org"
 
-WORKDIR /usr/src/JSON2RDF
+COPY ./app ${APP_HOME}
 
-RUN mvn clean install
+RUN sudo chown -R $USER:$USER ${APP_HOME} && ls -al ${APP_HOME}
+
+# ---- build 
+WORKDIR ${APP_HOME}
+USER $USER
+
+RUN mvn clean package
 
 ### entrypoint
-
 ENTRYPOINT ["java", "-jar", "target/json2rdf-1.0.1-jar-with-dependencies.jar"]

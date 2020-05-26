@@ -1,0 +1,3 @@
+_:B57e1d5dfX2Db739X2D41ecX2Db319X2D5609cb83bf80 <https://example.com/test#name> "Markus Lanthaler" .
+_:B57e1d5dfX2Db739X2D41ecX2Db319X2D5609cb83bf80 <https://example.com/test#homepage> "http://www.markus-lanthaler.com/" .
+_:B57e1d5dfX2Db739X2D41ecX2Db319X2D5609cb83bf80 <https://example.com/test#image> "http://twitter.com/account/profile_image/markuslanthaler" .
