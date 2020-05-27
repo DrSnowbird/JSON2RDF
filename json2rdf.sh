@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function usage() {
-    echo "$(basename $0) -i <JSON_INPUT> [-o <TTL_OUTPUT>] [-b <BASE_URL>] [--input-charset <INPUT_CHARSET>] [--output-charset <OUTPUT_CHARSET>]"
+    echo "$(basename $0) -i <JSON_INPUT> [-o <TTL_OUTPUT>] [-b <BASE_URL>] [-v <VOCABULARY_FILE>] [--input-charset <INPUT_CHARSET>] [--output-charset <OUTPUT_CHARSET>]"
     if [ $# -lt 1 ]; then
         echo "Missing input JSON file! Abort!"
     fi
@@ -27,7 +27,8 @@ OUTPUT_CHARSET=
 INPUT_CHARSET_ARGS=
 OUTPUT_CHARSET_ARGS=
 TTL_OUTPUT=
-while getopts "i:o:b:h-:" arg; do
+VOCABULARY_FILE=
+while getopts "i:o:b:v:h-:" arg; do
   case $arg in
     -)
         case "${OPTARG}" in
@@ -66,6 +67,10 @@ while getopts "i:o:b:h-:" arg; do
     b)
       BASE_URL=${OPTARG}
       echo "BASE_URL=$BASE_URL"
+      ;;
+    v)
+      VOCABULARY_FILE=${OPTARG}
+      echo "VOCABULARY_FILE=$VOCABULARY_FILE"
       ;;
     h)
       usage "help"
@@ -106,11 +111,26 @@ fi
 
 echo "remaining args: $*"
 
+function generate_Ontology_Vocabulary() {
+    echo
+    echo "------------- Generating Vocabulary List: --------------"
+    if [ ! -z "${VOCABULARY_FILE}" ] ; then
+        cat $1 | cut -d'<' -f2|cut -d'>' -f1 |sort -u | tee 
+    fi
+}
+
 #cat ordinary-json-document.json | docker run -i -a stdin -a stdout -a stderr atomgraph/json2rdf https://localhost/ | riot --formatted=TURTLE
 #cat ${JSON_INPUT} | docker run -i -a stdin -a stdout -a stderr atomgraph/json2rdf https://localhost/ | riot --formatted=TURTLE
 
+echo
+echo "------------- Generating RDF in Tutrle (*.ttl) format: --------------"
 if [ "$TTL_OUTPUT" != "" ]; then
     cat ${JSON_INPUT} | docker run -i -a stdin -a stdout -a stderr ${imageTag} ${BASE_URL} ${INPUT_CHARSET_ARGS} ${OUTPUT_CHARSET_ARGS} | tee ${TTL_OUTPUT}
+    generate_Ontology_Vocabulary ${TTL_OUTPUT}
 else
-    cat ${JSON_INPUT} | docker run -i -a stdin -a stdout -a stderr ${imageTag} ${BASE_URL} ${INPUT_CHARSET_ARGS} ${OUTPUT_CHARSET_ARGS} 
+    cat ${JSON_INPUT} | docker run -i -a stdin -a stdout -a stderr ${imageTag} ${BASE_URL} ${INPUT_CHARSET_ARGS} ${OUTPUT_CHARSET_ARGS} | tee .json-to-rdf-ttl.tmp
+    generate_Ontology_Vocabulary .json-to-rdf-ttl.tmp
+    rm -f .json-to-rdf-ttl.tmp
 fi
+
+
