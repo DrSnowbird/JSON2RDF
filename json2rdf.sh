@@ -7,6 +7,18 @@ function usage() {
     fi
 }
 
+###################################################
+#### ---- Change this only to use your own ----
+###################################################
+ORGANIZATION=${ORGANIZATION:-openkbs}
+baseDataFolder="${HOME}/data-docker"
+
+###################################################
+#### **** Container package information ****
+###################################################
+DOCKER_IMAGE_REPO=`echo $(basename $PWD)|tr '[:upper:]' '[:lower:]'|tr "/: " "_" `
+imageTag=${imageTag:-${ORGANIZATION}/${DOCKER_IMAGE_REPO}}
+
 # `--input-charset` - JSON input encoding, by default UTF-8
 # `--output-charset` - RDF output encoding, by default UTF-8
 
@@ -98,7 +110,7 @@ echo "remaining args: $*"
 #cat ${JSON_INPUT} | docker run -i -a stdin -a stdout -a stderr atomgraph/json2rdf https://localhost/ | riot --formatted=TURTLE
 
 if [ "$TTL_OUTPUT" != "" ]; then
-    cat ${JSON_INPUT} | docker run -i -a stdin -a stdout -a stderr openkbs/json2rdf-docker ${BASE_URL} ${INPUT_CHARSET_ARGS} ${OUTPUT_CHARSET_ARGS} | tee ${TTL_OUTPUT}
+    cat ${JSON_INPUT} | docker run -i -a stdin -a stdout -a stderr ${imageTag} ${BASE_URL} ${INPUT_CHARSET_ARGS} ${OUTPUT_CHARSET_ARGS} | tee ${TTL_OUTPUT}
 else
-    cat ${JSON_INPUT} | docker run -i -a stdin -a stdout -a stderr openkbs/json2rdf-docker${BASE_URL} ${INPUT_CHARSET_ARGS} ${OUTPUT_CHARSET_ARGS} 
+    cat ${JSON_INPUT} | docker run -i -a stdin -a stdout -a stderr ${imageTag} ${BASE_URL} ${INPUT_CHARSET_ARGS} ${OUTPUT_CHARSET_ARGS} 
 fi
