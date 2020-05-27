@@ -31,6 +31,8 @@ Optional args:
 
 ./json2rdf.sh -i json/city-distances.json -b https://127.0.0.1/test
 
+./json2rdf.sh -i json/city-distances.json -v ontology/city-distances-vocab.txt
+
 ./json2rdf.sh -i json/city-distances.json -b https://127.0.0.1/test --input-charset utf-8
 ./json2rdf.sh -i json/city-distances.json -b https://127.0.0.1/test --input-charset=utf-8
 ./json2rdf.sh -i json/city-distances.json -b https://127.0.0.1/test --input-charset=utf-8 --output-charset=utf-8

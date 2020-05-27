@@ -111,23 +111,33 @@ fi
 
 echo "remaining args: $*"
 
+######################################################
+#### ---- Generate Ontology Vocabulary List ---- #####
+######################################################
 function generate_Ontology_Vocabulary() {
     echo
-    echo "------------- Generating Vocabulary List: --------------"
+    echo "------------- Generating Vocabulary List: ${VOCABULARY_FILE} --------------"
     if [ ! -z "${VOCABULARY_FILE}" ] ; then
-        cat $1 | cut -d'<' -f2|cut -d'>' -f1 |sort -u | tee 
+        cat $1 | cut -d'<' -f2|cut -d'>' -f1 |sort -u | tee ${VOCABULARY_FILE}
+    else
+        cat $1 | cut -d'<' -f2|cut -d'>' -f1 |sort -u
     fi
 }
 
+######################################################
+#### ---- Generate RDF in Turtle format:    ---- #####
+######################################################
 #cat ordinary-json-document.json | docker run -i -a stdin -a stdout -a stderr atomgraph/json2rdf https://localhost/ | riot --formatted=TURTLE
 #cat ${JSON_INPUT} | docker run -i -a stdin -a stdout -a stderr atomgraph/json2rdf https://localhost/ | riot --formatted=TURTLE
 
 echo
-echo "------------- Generating RDF in Tutrle (*.ttl) format: --------------"
+
 if [ "$TTL_OUTPUT" != "" ]; then
+    echo "------------- Generating RDF in Tutrle (*.ttl) format: ${TTL_OUTPUT} --------------"
     cat ${JSON_INPUT} | docker run -i -a stdin -a stdout -a stderr ${imageTag} ${BASE_URL} ${INPUT_CHARSET_ARGS} ${OUTPUT_CHARSET_ARGS} | tee ${TTL_OUTPUT}
     generate_Ontology_Vocabulary ${TTL_OUTPUT}
 else
+echo "------------- Generating RDF in Tutrle (*.ttl) format: --------------"
     cat ${JSON_INPUT} | docker run -i -a stdin -a stdout -a stderr ${imageTag} ${BASE_URL} ${INPUT_CHARSET_ARGS} ${OUTPUT_CHARSET_ARGS} | tee .json-to-rdf-ttl.tmp
     generate_Ontology_Vocabulary .json-to-rdf-ttl.tmp
     rm -f .json-to-rdf-ttl.tmp
