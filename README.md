@@ -1,4 +1,4 @@
-# JSON2RDF
+# JSON2RDF - Convert JSON (text file) to RDF file using Docker (as engine) with Command line
 Streaming generic JSON to RDF converter
 
 Reads JSON data and streams N-Triples output. The conversion algorithm is similar to that of [JSON-LD](https://www.w3.org/TR/json-ld11-api/) but accepts arbitrary JSON and does not require a `@context`.
@@ -6,33 +6,45 @@ Reads JSON data and streams N-Triples output. The conversion algorithm is simila
 The resulting RDF representation is lossless with the exception of array ordering and some [datatype round-tripping](https://www.w3.org/TR/json-ld11-api/#data-round-tripping).
 The lost ordering should not be a problem in the majority of cases, as RDF applications tend to impose their own value-based ordering using SPARQL `ORDER BY`.
 
-A common use case is feeding the JSON2RDF output into a triplestore or SPARQL processor and using a SPARQL `CONSTRUCT` query to map the generic RDF to more specific RDF that uses terms from some vocabulary.
+A common use case is 
+- Feeding the JSON2RDF output into a triplestore or SPARQL processor and 
+- Using a **SPARQL `CONSTRUCT`** query to map the generic RDF to more specific RDF that uses terms from some vocabulary.
+
 SPARQL is an inherently more flexible RDF mapping mechanism than JSON-LD `@context`.
 
-## Build (Docker)
+# Build (Docker)
 
     make build
 
-## Usage
+# Usage
 ```
-json2rdf.sh -i <JSON_INPUT> [-o <TTL_OUTPUT>] [-b <BASE_URL>] [--input-charset <INPUT_CHARSET>] [--output-charset <OUTPUT_CHARSET>]
-
+./json2rdf.sh -i <JSON_INPUT> [-o <TTL_OUTPUT>] [-b <BASE_URL>] [-v <VOCABULARY_FILE>] [--input-charset <INPUT_CHARSET>] [--output-charset <OUTPUT_CHARSET>]
 ```
 * `JSON_INPUT`: The JSON data 
 * `TTL_OUTPUT`: The resulting RDF data is written in TTL.
 * `BASE_URL`  : The base URI for the data. Property namespace is constructed by adding `#` to the base URI. Default is "https://localhost/"
-Optional args:
+* `VOCABULARY_FILE`: The vocabulary list (in URL format) to be referenced by the generated RDF file. For example,
+    ```
+    https://localhost/#Amsterdam
+    https://localhost/#Brussels
+    https://localhost/#cities
+    https://localhost/#desc
+    https://localhost/#distance
+    https://localhost/#London
+    https://localhost/#Paris
+    https://localhost/#to
+    https://localhost/#updated
+    https://localhost/#uptodate
+    ```
+Additonal optional args (usually Default is enough for common needs - but you can change it as below):
 * `--input-charset` - JSON input encoding, by default UTF-8
 * `--output-charset` - RDF output encoding, by default UTF-8
 
 ## Examples
 ```
 ./json2rdf.sh -i json/city-distances.json 
-
 ./json2rdf.sh -i json/city-distances.json -b https://127.0.0.1/test
-
 ./json2rdf.sh -i json/city-distances.json -v ontology/city-distances-vocab.txt
-
 ./json2rdf.sh -i json/city-distances.json -b https://127.0.0.1/test --input-charset utf-8
 ./json2rdf.sh -i json/city-distances.json -b https://127.0.0.1/test --input-charset=utf-8
 ./json2rdf.sh -i json/city-distances.json -b https://127.0.0.1/test --input-charset=utf-8 --output-charset=utf-8
@@ -47,9 +59,7 @@ Optional args:
 ```
 
 ***
-
 Bob DuCharme's blog post on using JSON2RDF: [Converting JSON to RDF](http://www.bobdc.com/blog/json2rdf/).
-
 ***
 
 JSON data in [`example.json`](https://www.w3.org/TR/json-ld11/#interpreting-json-as-json-ld)
@@ -190,12 +200,12 @@ Turtle output
 ] .
 ```
 
-## Performance
-(from upstream's Performance text - not by me)
+# Performance
+(from upstream's Performance text - not by me since this section is just inheriting from upstream.)
 Largest dataset tested so far: 2.95 GB / 30459482 lines of JSON to 4.5 GB / 21964039 triples in 2m10s.
 Hardware: x64 Windows 10 PC with Intel Core i5-7200U 2.5 GHz CPU and 16 GB RAM.
 
-## Dependencies
+# Dependencies
 
 * [javax.json](https://mvnrepository.com/artifact/org.glassfish/javax.json)
 * [Apache Jena](https://jena.apache.org/)

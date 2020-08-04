@@ -10,7 +10,7 @@ URL_REF=https://example.com/test#
 
 JAR=./target/json2rdf-1.0.1-jar-with-dependencies.jar
 
-JSON_INPUT=${1:-./sample.json}
+JSON_INPUT=${1:-./example.json}
 TTL_OUTPUT=${2:-./${JSON_INPUT%.json}.ttl}
 
 ## java -jar json2rdf-1.0.1-jar-with-dependencies.jar http://example.com/test# < myinput.json > myoutput.ttl
